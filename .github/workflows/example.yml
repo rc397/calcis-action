@@ -1,0 +1,26 @@
+# Example workflow: estimate LLM costs when prompt files change.
+#
+# To use this in your own repo, copy this file and set the
+# CALCIS_API_KEY secret in your repository settings.
+
+name: LLM Cost Estimate
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  estimate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Estimate LLM costs
+        uses: rc397/calcis-action@v1
+        with:
+          api-key: ${{ secrets.CALCIS_API_KEY }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
