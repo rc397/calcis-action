@@ -2,8 +2,8 @@ name: "Calcis LLM Cost Estimate"
 author: "Calcis"
 description: "Automatically estimate LLM API costs for prompt files changed in a PR. Posts a cost breakdown table as a comment."
 branding:
-  icon: "zap"
-  color: "gray-dark"
+  icon: "check-circle"
+  color: "green"
 inputs:
   api-key:
     description: "Calcis API key (starts with calc_). Get one at https://calcis.dev/dashboard"
