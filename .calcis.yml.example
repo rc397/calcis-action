@@ -1,0 +1,63 @@
+# .calcis.yml — Calcis LLM cost estimation configuration
+#
+# Copy this file to your repository root as .calcis.yml and tune the values
+# for your team. See https://github.com/rc397/calcis-action for full docs.
+#
+# Recommended adoption path:
+#   1. Commit this file to your default branch with `fail-on-budget: false`
+#      in the workflow.
+#   2. Merge a few PRs that touch prompt files. Observe the reported costs and
+#      deltas in PR comments.
+#   3. Tune the thresholds below to values that make sense for your team.
+#   4. Flip the workflow to `fail-on-budget: true` and add `calcis/cost` as a
+#      required status check in branch protection. From that point on, PRs
+#      that exceed fail thresholds can no longer be merged.
+
+# Schema version. Required. Currently must be 1.
+version: 1
+
+# ── Default model ────────────────────────────────────────────────
+# Model used for estimation when no per-path override matches.
+# Overrides the `model` action input. Any model listed at
+# https://calcis.dev/models is valid.
+model: claude-sonnet-4-6
+
+# ── File patterns ────────────────────────────────────────────────
+# Glob patterns that identify prompt files in your repository.
+# Overrides the `file-patterns` action input. A file matching any of these
+# patterns will be estimated when it changes in a PR.
+file-patterns:
+  - "**/*.prompt"
+  - "**/prompts/**"
+  # - "src/chains/**/*.py"
+  # - "agents/**/*.md"
+
+# ── Budgets ──────────────────────────────────────────────────────
+# Cost thresholds in USD. Drive the `calcis/cost` check conclusion.
+# Warn thresholds produce warning annotations but the check still passes.
+# Fail thresholds cause the check to fail when `fail-on-budget: true`.
+# Omit any key to disable that threshold.
+budgets:
+  # Applied to each individual prompt file in the PR.
+  per-file-warn: 0.05
+  per-file-fail: 0.50
+
+  # Applied to the sum of all file estimates in the PR.
+  total-warn: 0.25
+  total-fail: 2.00
+
+# ── Projection ───────────────────────────────────────────────────
+# Optional. When `monthly-calls` is set, the PR comment includes a monthly
+# cost projection line: `total cost × monthly-calls`.
+projection:
+  monthly-calls: 100000
+
+# ── Per-path model overrides ─────────────────────────────────────
+# Optional. Use a different model for files matching a glob. First match
+# wins, so order matters. Useful for running expensive models only on
+# critical customer-facing prompts and cheap models on internal tooling.
+overrides:
+  - path: "prompts/customer-facing/**"
+    model: claude-opus-4-6
+  - path: "prompts/internal/**"
+    model: gpt-4o-mini
