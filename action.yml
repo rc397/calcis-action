@@ -1,6 +1,6 @@
 name: "Calcis LLM Cost Estimate"
 author: "Calcis"
-description: "Automatically estimate LLM API costs for prompt files changed in a PR. Posts a cost breakdown table as a comment."
+description: "Estimate LLM API costs for prompt files changed in a PR, show the cost delta vs the base branch, and gate merges on budget thresholds via the calcis/cost check."
 branding:
   icon: "check-circle"
   color: "green"
@@ -9,24 +9,38 @@ inputs:
     description: "Calcis API key (starts with calc_). Get one at https://calcis.dev/dashboard"
     required: true
   model:
-    description: "LLM model to estimate costs for (e.g. claude-sonnet-4-6, gpt-4o, gemini-2-5-flash)"
+    description: "Default LLM model to estimate costs for (e.g. claude-sonnet-4-6, gpt-4o). Overridden by `model` in .calcis.yml when present."
     required: false
     default: "claude-sonnet-4-6"
   file-patterns:
-    description: "Comma-separated glob patterns for prompt files to scan"
+    description: "Comma-separated glob patterns for prompt files to scan. Overridden by `file-patterns` in .calcis.yml when present."
     required: false
     default: "**/*.prompt,**/prompts/**"
   max-files:
     description: "Maximum number of files to estimate per run (prevents excessive API calls)"
     required: false
     default: "10"
+  monthly-calls:
+    description: "Estimated API calls per month. When set, the PR comment includes a monthly cost projection. Overridden by `projection.monthly-calls` in .calcis.yml."
+    required: false
+    default: ""
+  fail-on-budget:
+    description: "When true, the calcis/cost check fails if any `.calcis.yml` fail threshold is exceeded. Set to false to configure budgets without blocking merges during rollout."
+    required: false
+    default: "true"
 outputs:
   total-cost:
-    description: "Total estimated cost in USD"
+    description: "Total estimated cost of the PR in USD"
+  delta-total:
+    description: "Total cost delta in USD (PR total minus base total)"
   files-scanned:
     description: "Number of prompt files scanned"
   files-skipped:
     description: "Number of files skipped (over limit, too large, or empty)"
+  budget-status:
+    description: "Budget evaluation result: pass, warn, or fail"
+  monthly-projection:
+    description: "Projected monthly cost in USD when monthly-calls is configured (otherwise 0)"
 runs:
   using: "node20"
   main: "dist/index.js"
