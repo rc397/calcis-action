@@ -1,31 +1,40 @@
 name: "Calcis LLM Cost Estimate"
 author: "Calcis"
-description: "Estimate LLM API costs for prompt files changed in a PR, show the cost delta vs the base branch, and gate merges on budget thresholds via the calcis/cost check."
+description: "Estimate LLM API costs for prompt files in PRs. Cost deltas,
+  budget gates, 25+ models."
 branding:
-  icon: "check-circle"
+  icon: "dollar-sign"
   color: "green"
 inputs:
   api-key:
-    description: "Calcis API key (starts with calc_). Get one at https://calcis.dev/dashboard"
+    description: "Calcis API key (starts with calc_). Get one at
+      https://calcis.dev/dashboard"
     required: true
   model:
-    description: "Default LLM model to estimate costs for (e.g. claude-sonnet-4-6, gpt-4o). Overridden by `model` in .calcis.yml when present."
+    description: "Default LLM model to estimate costs for (e.g. claude-sonnet-4-6,
+      gpt-4o). Overridden by `model` in .calcis.yml when present."
     required: false
     default: "claude-sonnet-4-6"
   file-patterns:
-    description: "Comma-separated glob patterns for prompt files to scan. Overridden by `file-patterns` in .calcis.yml when present."
+    description: "Comma-separated glob patterns for prompt files to scan. Overridden
+      by `file-patterns` in .calcis.yml when present."
     required: false
     default: "**/*.prompt,**/prompts/**"
   max-files:
-    description: "Maximum number of files to estimate per run (prevents excessive API calls)"
+    description: "Maximum number of files to estimate per run (prevents excessive
+      API calls)"
     required: false
     default: "10"
   monthly-calls:
-    description: "Estimated API calls per month. When set, the PR comment includes a monthly cost projection. Overridden by `projection.monthly-calls` in .calcis.yml."
+    description: "Estimated API calls per month. When set, the PR comment includes a
+      monthly cost projection. Overridden by `projection.monthly-calls` in
+      .calcis.yml."
     required: false
     default: ""
   fail-on-budget:
-    description: "When true, the calcis/cost check fails if any `.calcis.yml` fail threshold is exceeded. Set to false to configure budgets without blocking merges during rollout."
+    description: "When true, the calcis/cost check fails if any `.calcis.yml` fail
+      threshold is exceeded. Set to false to configure budgets without blocking
+      merges during rollout."
     required: false
     default: "true"
 outputs:
@@ -40,7 +49,8 @@ outputs:
   budget-status:
     description: "Budget evaluation result: pass, warn, or fail"
   monthly-projection:
-    description: "Projected monthly cost in USD when monthly-calls is configured (otherwise 0)"
+    description: "Projected monthly cost in USD when monthly-calls is configured
+      (otherwise 0)"
 runs:
   using: "node20"
   main: "dist/index.js"
